@@ -1,3 +1,5 @@
+Fork of ellmer from tidyverse. Need to adapt Ollama Provider because we use api token for authentification inside our company.
+
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
