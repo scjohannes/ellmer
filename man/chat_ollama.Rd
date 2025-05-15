@@ -9,6 +9,7 @@ chat_ollama(
   system_prompt = NULL,
   base_url = "http://localhost:11434",
   model,
+  api_key = ollama_key(),
   seed = NULL,
   api_args = list(),
   echo = NULL
@@ -23,6 +24,11 @@ models_ollama(base_url = "http://localhost:11434")
 
 \item{model}{The model to use for the chat.
 Use \code{models_ollama()} to see all options.}
+
+\item{api_key}{API key to use for authentication if the Ollama instance
+requires one. Defaults to the value of the \code{OLLAMA_API_KEY} environment
+variable, or "ollama" if not set (this default is typically ignored by
+unauthenticated Ollama servers).}
 
 \item{seed}{Optional integer seed that ChatGPT uses to try and make output
 more reproducible.}
@@ -69,6 +75,10 @@ tried it with.
 \dontrun{
 chat <- chat_ollama(model = "llama3.2")
 chat$chat("Tell me three jokes about statisticians")
+
+# If your Ollama is behind an authenticated proxy:
+# Sys.setenv(OLLAMA_API_KEY = "your_ollama_token")
+# chat_auth <- chat_ollama(model = "llama3.2")
 }
 }
 \seealso{

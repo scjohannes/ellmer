@@ -1,3 +1,12 @@
+ollama_key <- function() {
+  key <- Sys.getenv("OLLAMA_API_KEY")
+  if (!identical(key, "")) {
+    key
+  } else {
+    "ollama" # Default if no env var is set, typically ignored by local Ollama
+  }
+}
+
 #' Chat with a local Ollama model
 #'
 #' @description
@@ -22,6 +31,10 @@
 #'
 #' @inheritParams chat_openai
 #' @param model `r param_model(NULL, "ollama")`
+#' @param api_key API key to use for authentication if the Ollama instance
+#'   requires one. Defaults to the value of the `OLLAMA_API_KEY` environment
+#'   variable, or "ollama" if not set (this default is typically ignored by
+#'   unauthenticated Ollama servers).
 #' @inherit chat_openai return
 #' @family chatbots
 #' @export
@@ -29,11 +42,16 @@
 #' \dontrun{
 #' chat <- chat_ollama(model = "llama3.2")
 #' chat$chat("Tell me three jokes about statisticians")
+#'
+#' # If your Ollama is behind an authenticated proxy:
+#' # Sys.setenv(OLLAMA_API_KEY = "your_ollama_token")
+#' # chat_auth <- chat_ollama(model = "llama3.2")
 #' }
 chat_ollama <- function(
   system_prompt = NULL,
   base_url = "http://localhost:11434",
   model,
+  api_key = ollama_key(), # UPDATED: Use helper for api_key
   seed = NULL,
   api_args = list(),
   echo = NULL
@@ -43,7 +61,7 @@ chat_ollama <- function(
   }
 
   if (missing(model)) {
-    models <- models_ollama(base_url)$name
+    models <- models_ollama(base_url)$name # Consider if models_ollama also needs api_key
     cli::cli_abort(c(
       "Must specify {.arg model}.",
       i = "Locally installed models: {.str {models}}."
@@ -58,7 +76,7 @@ chat_ollama <- function(
     model = model,
     seed = seed,
     extra_args = api_args,
-    api_key = "ollama" # ignored
+    api_key = api_key # UPDATED: Pass the resolved api_key
   )
 
   Chat$new(provider = provider, system_prompt = system_prompt, echo = echo)
